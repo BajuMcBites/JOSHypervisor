@@ -34,14 +34,23 @@ struct Proghdr {
 It is a struct that is used to parse information of the program header file. This is done by initializing a pointer that points to the starting point of the ELF headers. The headers are then iterated through by tracking the end of the headers using the eph pointer. On each iterations, if the header is of type "ELF_PROG_LOAD", memory is allocated and set based on the variables in the headers, namely p_va, p_filesz, P_memsz, and p_offset.
 
 The Proghdr struct has:
+
 p_type: the type of the segment or section. This is used to determine if the header is of the loadable type.
+
 p_flags: This field contains flags that describe various permissions associated with the segment (executable, writable, readable)
+
 p_offset: This field represents the offset in the file where the segment's data begins.
+
 p_va: This field represents the virtual address of the segment when loaded into memory. This is the address where the segment will be mapped in the virtual memory space of the process.
+
 p_pa: This field represents the physical address of the segment.
+
 p_filesz: This field specifies the size of the segment in the file.
+
 p_memsz: This field specifies the size of the segment in memory. It indicates how much memory the segment occupies when loaded into memory. This is most likely different than p_filesz if the segment contains data that occupies space in memory but is not stored in the file.
+
 p_align: This field specifies the alignment requirement for the segment. It indicates the boundary to which the segment's data should be aligned in memory and in the file.
+
 
 It loads an ELF binary into memory for execution within a given environment. It verifies the binary's validity, sets up paging, and iterates through program headers to load program segments into memory. It allocates memory regions, copies segment data, and ensures proper alignment for the stack. Additionally, it loads debug sections if present. If the binary is invalid, it triggers a panic. Finally, it stores a pointer to the ELF binary within the environment structure. Overall, the function prepares the program in the environment for execution by handling memory allocation, segment loading, stack setup, and debug section loading.
 
@@ -50,7 +59,7 @@ It loads an ELF binary into memory for execution within a given environment. It 
 
 First we allocate "physical" memory in the environment and then copy program headers from the elf into the memory we just allocated 
 
-Additonallly one page is allocated in the enviroment for the program stack. The program stack is offset from the user stack by one poge (on top of the stack overflow guard page).
+Additionally one page is allocated in the enviroment for the program stack. The program stack is offset from the user stack by one poge (on top of the stack overflow guard page).
 
 If debug information is present, space for that is also allocated in the environment and copied over
 
@@ -59,10 +68,14 @@ the memory for the enviroment is allocated on the host. The memory for the ELF h
 
 ## The first function you implement in this project will have you check many errors, prior to the actual function logic. What are some of the reasons why we must do this in OS level code that the user never sees?
 
-System Stability: OS-level code often operates at a high privilege level, with access to critical system resources. Errors in this code can lead to system crashes or instability. Therefore, preemptive error checking is essential to maintain the overall stability of the system.
+Security: The OS must ensure that operations do not violate security boundaries. For example, checking permissions and ensuring that a user process cannot access or modify memory that it doesn't have rights to is essential for maintaining system security. 
+Furthermore, since the function sys_ept_map is a system call, it acts as a controlled interface between user applications and the kernel. Rigorous checks are necessary to maintain the integrity of this boundary, ensuring that user applications don't perform operations that are only meant for the kernel.
 
-Ease of Debugging and Maintenance: When errors are checked and handled properly, it becomes easier to debug and maintain the system. It helps in isolating and identifying the source of problems, which is crucial for the continuous development of the OS.
+Stability and Reliability: The OS is responsible for the stable operation of the entire system. Incorrect memory mappings or accesses can lead to system crashes or unpredictable behavior. By validating inputs and states, the OS can prevent operations that might compromise system stability.
 
+Resource Management: The OS manages hardware resources, such as memory, and it must ensure that these resources are used efficiently and not wasted. For instance, preventing the mapping of already used or non-existent memory addresses helps in optimal resource utilization.
+
+Debugging and Maintenance: Clear and comprehensive error checking makes it easier to debug and maintain the system. When a failure occurs, the system can provide more informative error messages, which aids in identifying and resolving issues more efficiently.
 
 Recommended files to look through before starting:
 inc/memlayout.h describes and provides an ASCII image of the virtual memory map. 
