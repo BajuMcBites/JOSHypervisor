@@ -1,0 +1,85 @@
+Pre-lab Questions 
+
+1. Which register contains the return value of the function? What is the value 
+you see? Is this an address or a constant value?
+
+From our output, the RAX register contains the return value of the function. 
+This is a memory address that points to the location in memory that the function
+ should return it. It has the hex value 0x80042095b6. 
+
+2.Which register contains the next assembly instruction to execute? What is the 
+value you see? Is this an address or a constant value?
+
+The RIP register contains the next assembly instruction to execute. This value 
+is also a memory address with the value of 0x80042095b6 and points to the start 
+of the env_pop_tf(struct Trapframe *tf) function, where the breakpoint was 
+placed. 
+
+3. Using the answer from the previous question, what are the next 5 instructions
+ that will be executed? What are the hex codes of those functions? (hint: see 
+ display in gdb)
+
+The next five instructions are as follows: 
+   0x80042095b6 <env_pop_tf>:   push   %rbp
+   0x80042095b7 <env_pop_tf+1>: mov    %rsp,%rbp
+   0x80042095ba <env_pop_tf+4>: push   %rbx
+   0x80042095bb <env_pop_tf+5>: sub    $0x18,%rsp
+   0x80042095bf <env_pop_tf+9>: mov    %rdi,-0x18(%rbp)
+
+4. Explain what the following assembly instructions are doing, line by line.
+
+push %rbp
+mov %rsp,%rbp
+push %rbx
+sub $0x18,%rsp
+The first instruction stores the old base pointer onto the stack. Then, the 
+stack pointer is updated to point to where the base pointer was originally 
+pointing to. Next, the contents of rbx which is a general-purpose register are 
+stored on the stack. Lastly, the stack pointer is updated to point to a memory 
+location that is 18 less than its current location. 
+
+5. Using the stepi functionality in GDB, which will execute one instruction at 
+a time, what do the registers look like after the above instructions are 
+executed?  
+
+After the above instructions are executed, the registers contain the following 
+values: 
+
+rax            0x80042095b6     549825058230
+rbx            0x106500 1074432
+rcx            0x8004233760     549825230688
+rdx            0x8004233760     549825230688
+rsi            0x0      0
+rdi            0x8004841000     549831577600
+rbp            0x8004232f90     0x8004232f90
+rsp            0x8004232f70     0x8004232f70
+r8             0x1b     27
+r9             0x30     48
+r10            0x8004209c14     549825059860
+r11            0x0      0
+r12            0x0      0
+r13            0x0      0
+r14            0x0      0
+r15            0x0      0
+rip            0x80042095bf     0x80042095bf <env_pop_tf+9>
+eflags         0x200002 [ ID ]
+cs             0x8      8
+ss             0x10     16
+ds             0x10     16
+es             0x10     16
+fs             0x23     35
+gs             0x23     35
+
+
+6. Notice that the first line of assembly in the __asm__volatile() call is movq 
+%0,%%rsp. If you were to change this line to movq $0,%%rsp (notice the $), you 
+would see an error in GDB the next time rsp is used. Why would this change 
+introduce an error?
+
+If we were to change the original movq instruction to movq $0,%%rsp, then it 
+would induce an error because it would set the stack pointer to 0, causing it 
+to point at an invalid location in memory. In the first instruction, on the 
+other hand, the %0 serves as a placeholder where the value of the stack pointer 
+would be contained. 
+
+

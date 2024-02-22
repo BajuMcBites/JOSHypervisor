@@ -1,0 +1,79 @@
+Sahaj Bhakta and Pranav Budhwar
+
+1. What does the cpuid assembly instruction do in this function?
+
+depending on the input argument "info", cpuid will return various information about the processor. 
+The information is stored in the eax, ebx, ecx, edx registers.
+
+"info" is passed into eax which will determine the outputs of cpuid.
+
+2. How is the function providing values back to you to use?
+
+we can access the values through the pointers passed in the function argument.
+After the asm instruction the pointers point to the output of the cpuid instruction (if there was an output)
+
+
+It provides values through the values stored in the eax, ebx, ecx, and edx
+registers. Which (ebx, ecx, and edx) can each be interpreted as strings and
+piced together to get the manufacturer's string ID.
+
+3. What are the results of eax, ecx, and ebx values in hexadecimal? Hint: you 
+can print program variables from GDBLinks to an external site.
+
+eax = 0xd
+ebx = 0x756e6547
+ecx = 0x6c65746e
+
+4. Now examine the values of these variables as strings. Hint: look at the 
+values in hexadecimal and translate them to strings, in the order ebx, edx, 
+ecx. What do you observe? The Wikipedia pageLinks to an external site. for the 
+`cpuid` instruction may help you interpret this output.
+
+eax = 'ctrl'
+
+ebx = uneG
+
+ecx = letn
+
+edx = Ieni
+
+"GenuineIntel"
+
+5. There is a reference in each Env struct for another struct called
+VmxGuestInfo. What kind of information does this struct hold?
+
+
+```
+struct VmxGuestInfo {
+	int64_t phys_sz;
+	uintptr_t *vmcs;
+
+	// Exception bitmap.
+	uint32_t exception_bmap;
+	// I/O bitmap.
+	uint64_t *io_bmap_a;
+	uint64_t *io_bmap_b;
+	// MSR load/store area.
+	int msr_count;
+	uintptr_t *msr_host_area;
+	uintptr_t *msr_guest_area;
+	int vcpunum;
+};
+```
+
+it holds the size of the vm, a pointer to the vm control structure, some bitmaps,
+and other info.
+
+6. From this Intel guideLinks to an external site., find out what the vmcs
+pointer in this struct stands for, and what it purpose it serves.
+
+VIRTUAL-MACHINE CONTROL STRUCTURE
+
+VMX non-root operation and VMX transitions
+
+7. What assembly instruction initializes the vmcs pointer? In other words, how
+do we change the vmcs pointer?
+
+vmptrld is used to change the vmcs pointer.
+
+
